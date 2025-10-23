@@ -9,3 +9,4 @@ export * from './user.js';
 export * from './api-key.js';
 export * from './link-wallet.js';
 export * from './authenticated-user.js';
+export * from './signup.js';
