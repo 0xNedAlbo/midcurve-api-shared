@@ -53,6 +53,10 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
+    "yalc:link": "yalc link @midcurve/shared && npm install",
+    "yalc:update": "yalc update @midcurve/shared",
+    "yalc:unlink": "yalc remove @midcurve/shared && npm install",
+    "yalc:clean": "rimraf .yalc yalc.lock",
     "yalc:publish": "npm run build && yalc publish",
     "yalc:push": "npm run build && yalc push"
   },
