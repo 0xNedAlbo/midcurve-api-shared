@@ -79,6 +79,10 @@ export interface TokenSearchCandidate {
   address: string;
   /** EVM chain ID where this token exists */
   chainId: number;
+  /** Token logo URL from CoinGecko (if available) */
+  logoUrl?: string;
+  /** Market cap in USD (used for sorting results by popularity) */
+  marketCap?: number;
 }
 
 /**
@@ -91,17 +95,14 @@ export interface SearchErc20TokensQuery {
   chainId: number;
 
   /**
-   * Optional - partial symbol match (case-insensitive)
+   * Optional - search query (searches both symbol AND name with OR logic)
+   * Can also be a full contract address for exact match
    */
-  symbol?: string;
-
-  /**
-   * Optional - partial name match (case-insensitive)
-   */
-  name?: string;
+  query?: string;
 
   /**
    * Optional - contract address to search for (exact match, case-insensitive)
+   * Deprecated: Use `query` parameter instead
    */
   address?: string;
 }
@@ -110,7 +111,7 @@ export interface SearchErc20TokensQuery {
  * GET /api/v1/tokens/erc20/search - Query validation
  *
  * chainId is REQUIRED
- * At least one of symbol, name, or address must be provided
+ * At least one of query or address must be provided
  */
 export const SearchErc20TokensQuerySchema = z
   .object({
@@ -118,18 +119,17 @@ export const SearchErc20TokensQuerySchema = z
       .number()
       .int('Chain ID must be an integer')
       .positive('Chain ID must be positive'),
-    symbol: z.string().min(1, 'Symbol must not be empty').optional(),
-    name: z.string().min(1, 'Name must not be empty').optional(),
+    query: z.string().min(1, 'Query must not be empty').optional(),
     address: z
       .string()
       .regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid Ethereum address format')
       .optional(),
   })
   .refine(
-    (data) => data.symbol !== undefined || data.name !== undefined || data.address !== undefined,
+    (data) => data.query !== undefined || data.address !== undefined,
     {
-      message: 'At least one of symbol, name, or address must be provided',
-      path: ['symbol', 'name', 'address'],
+      message: 'At least one of query or address must be provided',
+      path: ['query', 'address'],
     }
   );
 
