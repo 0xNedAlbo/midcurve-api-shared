@@ -3,22 +3,24 @@
  *
  * Types for fetching real-time pool fee and volume data from subgraph.
  * Used for APR calculations and pool analytics.
+ *
+ * GET /api/pools/uniswapv3/:chainId/:poolAddress/metrics
  */
 
 import type { ApiResponse } from '../../common/api-response.js';
 
 /**
- * Request parameters for getting pool metrics
+ * Request parameters for getting pool metrics (from URL path)
  */
 export interface GetPoolMetricsRequest {
   /**
-   * Chain ID where pool exists
-   * @example 1 (Ethereum), 42161 (Arbitrum)
+   * Chain ID where pool exists (path parameter)
+   * @example "1" (Ethereum), "42161" (Arbitrum)
    */
-  chainId: number;
+  chainId: string;
 
   /**
-   * Pool contract address (EIP-55 checksummed)
+   * Pool contract address (EIP-55 checksummed) (path parameter)
    * @example "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8"
    */
   poolAddress: string;

@@ -1,7 +1,7 @@
 /**
  * Type definitions for Uniswap V3 Pool Lookup Endpoint
  *
- * GET /api/pools/uniswapv3/:address
+ * GET /api/pools/uniswapv3/:chainId/:address
  */
 
 import { z } from 'zod';
@@ -11,6 +11,12 @@ import type { UniswapV3Pool } from '@midcurve/shared';
  * Path parameters for pool lookup
  */
 export interface GetUniswapV3PoolParams {
+  /**
+   * EVM chain ID where the pool is deployed
+   * @example "1" (Ethereum), "42161" (Arbitrum), "8453" (Base)
+   */
+  chainId: string;
+
   /**
    * Pool contract address (EIP-55 checksummed or lowercase)
    * @example "0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443"
@@ -22,12 +28,6 @@ export interface GetUniswapV3PoolParams {
  * Query parameters for pool lookup
  */
 export interface GetUniswapV3PoolQuery {
-  /**
-   * EVM chain ID where the pool is deployed
-   * @example 1 (Ethereum), 42161 (Arbitrum), 8453 (Base)
-   */
-  chainId: number;
-
   /**
    * Whether to enrich response with subgraph metrics (TVL, volume, fees)
    * Defaults to false if not provided
@@ -125,9 +125,21 @@ export interface GetUniswapV3PoolData {
 /**
  * Schema for path parameters
  *
- * Validates pool contract address format (0x followed by 40 hex characters)
+ * Validates chainId (positive integer) and pool contract address format (0x followed by 40 hex characters)
  */
 export const GetUniswapV3PoolParamsSchema = z.object({
+  chainId: z
+    .string()
+    .min(1, 'chainId is required')
+    .regex(/^\d+$/, 'chainId must be a positive integer')
+    .transform((val) => parseInt(val, 10))
+    .pipe(
+      z
+        .number()
+        .int('chainId must be an integer')
+        .positive('chainId must be positive'),
+    ),
+
   address: z
     .string()
     .min(1, 'Pool address is required')
@@ -137,17 +149,9 @@ export const GetUniswapV3PoolParamsSchema = z.object({
 /**
  * Schema for query parameters
  *
- * Validates chainId (positive integer), optional metrics flag, and optional fees flag
+ * Validates optional metrics flag and optional fees flag
  */
 export const GetUniswapV3PoolQuerySchema = z.object({
-  chainId: z.coerce
-    .number({
-      required_error: 'chainId is required',
-      invalid_type_error: 'chainId must be a number',
-    })
-    .int('chainId must be an integer')
-    .positive('chainId must be positive'),
-
   metrics: z
     .string()
     .optional()

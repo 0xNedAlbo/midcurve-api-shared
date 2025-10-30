@@ -3,17 +3,19 @@
  *
  * Lightweight endpoint for fetching current pool price data.
  * Returns only sqrtPriceX96 and currentTick for fast price checks.
+ *
+ * GET /api/pools/uniswapv3/:chainId/:poolAddress/pool-price
  */
 
 /**
  * Get Pool Price Request
  *
  * Parameters extracted from URL path:
- * - chain: Chain ID (e.g., "1" for Ethereum)
+ * - chainId: Chain ID (e.g., "1" for Ethereum)
  * - poolAddress: Pool contract address (EIP-55 checksummed)
  */
 export interface GetPoolPriceRequest {
-  chain: string;
+  chainId: string;
   poolAddress: string;
 }
 
