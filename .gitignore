@@ -4,7 +4,6 @@ node_modules/
 yalc.lock
 
 # Build output
-dist/
 *.tsbuildinfo
 
 # Environment
